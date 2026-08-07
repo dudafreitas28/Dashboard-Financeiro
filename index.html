@@ -382,17 +382,17 @@
     <div id="login-screen">
         <div class="login-card">
             <h2>Financial</h2>
-            <p>Entre com sua conta para acessar o painel</p>
+            <p id="login-subtitle">Entre com sua conta para acessar o painel</p>
             <form id="login-form" onsubmit="fazerLogin(event)" style="display: flex; flex-direction: column; gap: 15px;">
                 <div class="input-group">
                     <label>Seu Nome ou E-mail</label>
-                    <input type="text" id="login-email" placeholder="ex: seuemail@dominio.com" required>
+                    <input type="text" id="login-email" placeholder="ex: seuemail@dominio.com" required oninput="verificarUsuarioCadastrado()">
                 </div>
                 <div class="input-group">
                     <label>Senha</label>
                     <input type="password" id="login-senha" placeholder="••••••••" required>
                 </div>
-                <button type="submit">Acessar Painel</button>
+                <button type="submit" id="btn-submit-login">Acessar Painel</button>
             </form>
         </div>
     </div>
@@ -586,10 +586,10 @@
         let transacoes = JSON.parse(localStorage.getItem('transacoes')) || [];
         let metaMensal = parseFloat(localStorage.getItem('metaMensal')) || 1000.00;
         let usuarioLogado = localStorage.getItem('usuarioLogado');
+        let senhaCadastrada = localStorage.getItem('senhaCadastrada');
         let meuGrafico = null;
 
         window.onload = function() {
-            // Inicializa o input de mês com o mês atual (ex: 2026-06)
             const hoje = new Date();
             const ano = hoje.getFullYear();
             const mes = String(hoje.getMonth() + 1).padStart(2, '0');
@@ -600,11 +600,43 @@
             }
         };
 
+        function verificarUsuarioCadastrado() {
+            const emailInput = document.getElementById('login-email').value.trim();
+            const senhaSalva = localStorage.getItem('senha_' + emailInput);
+            const sub = document.getElementById('login-subtitle');
+            const btn = document.getElementById('btn-submit-login');
+
+            if (emailInput && !senhaSalva) {
+                sub.innerText = "Primeiro acesso? Crie uma senha para sua conta";
+                btn.innerText = "Cadastrar e Entrar";
+            } else {
+                sub.innerText = "Entre com sua conta para acessar o painel";
+                btn.innerText = "Acessar Painel";
+            }
+        }
+
         function fazerLogin(event) {
             event.preventDefault();
-            const emailInput = document.getElementById('login-email').value;
-            localStorage.setItem('usuarioLogado', emailInput);
-            entrarNoSistema(emailInput);
+            const emailInput = document.getElementById('login-email').value.trim();
+            const senhaInput = document.getElementById('login-senha').value;
+
+            const chaveSenha = 'senha_' + emailInput;
+            const senhaSalva = localStorage.getItem(chaveSenha);
+
+            if (!senhaSalva) {
+                // Primeira vez cadastrando senha para este email
+                localStorage.setItem(chaveSenha, senhaInput);
+                localStorage.setItem('usuarioLogado', emailInput);
+                entrarNoSistema(emailInput);
+            } else {
+                // Valida a senha existente
+                if (senhaInput === senhaSalva) {
+                    localStorage.setItem('usuarioLogado', emailInput);
+                    entrarNoSistema(emailInput);
+                } else {
+                    alert('Senha incorreta! Tente novamente.');
+                }
+            }
         }
 
         function entrarNoSistema(usuario) {
@@ -655,7 +687,6 @@
                 return;
             }
 
-            // Pega a data atual completa para salvar o ano/mês da transação
             const dataAtual = new Date().toISOString();
 
             transacoes.push({ id: Date.now(), desc, valor, tipo, data: dataAtual });
@@ -704,11 +735,10 @@
         }
 
         function atualizarDashboard() {
-            const mesFiltro = document.getElementById('filtro-mes').value; // Formato "YYYY-MM"
+            const mesFiltro = document.getElementById('filtro-mes').value;
 
-            // Filtra as transações com base no mês selecionado (se a transação tiver data salva)
             let transacoesFiltradas = transacoes.filter(t => {
-                if (!t.data) return true; // Compatibilidade com transações antigas sem data
+                if (!t.data) return true;
                 return t.data.startsWith(mesFiltro);
             });
 
