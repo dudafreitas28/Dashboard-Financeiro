@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Financial | Controle Financeiro Profissional</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Importando o Chart.js para gráficos profissionais -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -178,6 +177,29 @@
             transition: background 0.2s;
         }
         .btn-logout:hover { background: rgba(239, 68, 68, 0.3); }
+
+        .filter-bar {
+            background: #0b0f19;
+            padding: 15px 25px;
+            border-radius: 12px;
+            border: 1px solid #1f2937;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .filter-bar label { font-size: 13px; color: #9ca3af; font-weight: 500; }
+        .filter-bar input[type="month"] {
+            background: #111827;
+            border: 1px solid #374151;
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+        .filter-bar input[type="month"]:focus { border-color: #6366f1; }
 
         .kpi-cards {
             display: grid;
@@ -399,6 +421,13 @@
 
             <!-- ABA DASHBOARD -->
             <div id="tab-dashboard" class="tab-pane active-pane">
+                
+                <!-- FILTRO POR MÊS -->
+                <div class="filter-bar">
+                    <label for="filtro-mes">Filtrar por Mês:</label>
+                    <input type="month" id="filtro-mes" onchange="atualizarDashboard()">
+                </div>
+
                 <div class="kpi-cards">
                     <div class="card">
                         <div class="card-title">Saldo Atual</div>
@@ -560,6 +589,12 @@
         let meuGrafico = null;
 
         window.onload = function() {
+            // Inicializa o input de mês com o mês atual (ex: 2026-06)
+            const hoje = new Date();
+            const ano = hoje.getFullYear();
+            const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+            document.getElementById('filtro-mes').value = `${ano}-${mes}`;
+
             if (usuarioLogado) {
                 entrarNoSistema(usuarioLogado);
             }
@@ -603,10 +638,7 @@
             document.getElementById('nav-' + abaId).classList.add('active');
 
             if (abaId === 'dashboard') {
-                atualizarGrafico(
-                    transacoes.filter(t => t.tipo === 'receita').reduce((acc, t) => acc + t.valor, 0),
-                    transacoes.filter(t => t.tipo === 'despesa').reduce((acc, t) => acc + t.valor, 0)
-                );
+                atualizarDashboard();
             }
         }
 
@@ -623,7 +655,10 @@
                 return;
             }
 
-            transacoes.push({ id: Date.now(), desc, valor, tipo });
+            // Pega a data atual completa para salvar o ano/mês da transação
+            const dataAtual = new Date().toISOString();
+
+            transacoes.push({ id: Date.now(), desc, valor, tipo, data: dataAtual });
             localStorage.setItem('transacoes', JSON.stringify(transacoes));
 
             fecharModal();
@@ -669,6 +704,14 @@
         }
 
         function atualizarDashboard() {
+            const mesFiltro = document.getElementById('filtro-mes').value; // Formato "YYYY-MM"
+
+            // Filtra as transações com base no mês selecionado (se a transação tiver data salva)
+            let transacoesFiltradas = transacoes.filter(t => {
+                if (!t.data) return true; // Compatibilidade com transações antigas sem data
+                return t.data.startsWith(mesFiltro);
+            });
+
             let receitas = 0;
             let despesas = 0;
             
@@ -680,13 +723,13 @@
             tbodyReceitas.innerHTML = '';
             tbodyDespesas.innerHTML = '';
 
-            let listaReceitas = transacoes.filter(t => t.tipo === 'receita');
-            let listaDespesas = transacoes.filter(t => t.tipo === 'despesa');
+            let listaReceitas = transacoesFiltradas.filter(t => t.tipo === 'receita');
+            let listaDespesas = transacoesFiltradas.filter(t => t.tipo === 'despesa');
 
-            if (transacoes.length === 0) {
-                tbodyDashboard.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #9ca3af;">Nenhuma transação cadastrada.</td></tr>`;
+            if (transacoesFiltradas.length === 0) {
+                tbodyDashboard.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #9ca3af;">Nenhuma transação neste mês.</td></tr>`;
             } else {
-                transacoes.slice().reverse().forEach(t => {
+                transacoesFiltradas.slice().reverse().forEach(t => {
                     if (t.tipo === 'receita') receitas += t.valor;
                     else despesas += t.valor;
 
@@ -704,7 +747,7 @@
             }
 
             if (listaReceitas.length === 0) {
-                tbodyReceitas.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #9ca3af;">Nenhuma receita cadastrada.</td></tr>`;
+                tbodyReceitas.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #9ca3af;">Nenhuma receita neste mês.</td></tr>`;
             } else {
                 listaReceitas.slice().reverse().forEach(t => {
                     let tr = document.createElement('tr');
@@ -718,7 +761,7 @@
             }
 
             if (listaDespesas.length === 0) {
-                tbodyDespesas.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #9ca3af;">Nenhuma despesa cadastrada.</td></tr>`;
+                tbodyDespesas.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #9ca3af;">Nenhuma despesa neste mês.</td></tr>`;
             } else {
                 listaDespesas.slice().reverse().forEach(t => {
                     let tr = document.createElement('tr');
