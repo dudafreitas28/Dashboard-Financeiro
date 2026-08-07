@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Dashboard Financeiro | Controle Pessoal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Financial | Controle Financeiro Profissional</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -16,12 +16,10 @@
         body {
             background-color: #05070a;
             color: #e5e7eb;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
-            overflow: hidden;
         }
 
-        /* Tela de Login / Identificação */
         #login-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -37,22 +35,26 @@
             padding: 40px;
             border-radius: 16px;
             border: 1px solid #1f2937;
-            width: 380px;
+            width: 400px;
+            max-width: 90%;
             text-align: center;
             display: flex;
             flex-direction: column;
             gap: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
 
-        .login-card h2 {
-            color: #fff;
-            font-size: 22px;
+        .login-card h2 { color: #fff; font-size: 24px; }
+        .login-card p { color: #9ca3af; font-size: 14px; margin-bottom: 5px; }
+
+        .input-group {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
-        .login-card p {
-            color: #9ca3af;
-            font-size: 14px;
-        }
+        .input-group label { font-size: 12px; color: #9ca3af; font-weight: 500; }
 
         .login-card input {
             background: #111827;
@@ -61,8 +63,12 @@
             border-radius: 8px;
             color: #fff;
             font-size: 15px;
-            text-align: center;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.2s;
         }
+
+        .login-card input:focus { border-color: #6366f1; }
 
         .login-card button {
             background: #6366f1;
@@ -73,15 +79,15 @@
             font-weight: 600;
             cursor: pointer;
             transition: background 0.2s;
+            margin-top: 10px;
         }
 
-        .login-card button:hover {
-            background: #4f46e5;
-        }
+        .login-card button:hover { background: #4f46e5; }
 
         .dashboard-container {
             display: flex;
             width: 100%;
+            min-height: 100vh;
         }
 
         .sidebar {
@@ -100,9 +106,7 @@
             margin-bottom: 50px;
         }
 
-        .brand span {
-            color: #6366f1;
-        }
+        .brand span { color: #6366f1; }
 
         .sidebar-nav {
             display: flex;
@@ -129,8 +133,8 @@
         .main-content {
             flex: 1;
             background-color: #05070a;
-            overflow-y: auto;
             padding: 0 40px 40px 40px;
+            overflow-y: visible;
         }
 
         .top-bar {
@@ -138,20 +142,14 @@
             justify-content: space-between;
             align-items: center;
             padding: 30px 0;
-            position: sticky;
-            top: 0;
-            background-color: #05070a;
-            z-index: 10;
         }
 
-        .top-bar h2 {
-            font-size: 20px;
-        }
+        .top-bar h2 { font-size: 20px; }
 
         .user-profile {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
         }
 
         .avatar {
@@ -166,11 +164,24 @@
             color: #fff;
         }
 
+        .btn-logout {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn-logout:hover { background: rgba(239, 68, 68, 0.3); }
+
         .kpi-cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 25px;
-            margin-bottom: 40px;
+            margin-bottom: 25px;
         }
 
         .card {
@@ -180,32 +191,38 @@
             border: 1px solid #1f2937;
         }
 
-        .card-icon {
-            font-size: 24px;
-            margin-bottom: 15px;
-            width: 45px;
-            height: 45px;
-            border-radius: 10px;
+        .card-title { font-size: 14px; color: #9ca3af; margin-bottom: 8px; }
+        .card-value { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+
+        /* Meta de Economia Refinada */
+        .goal-card {
+            background: #0b0f19;
+            padding: 20px 25px;
+            border-radius: 12px;
+            border: 1px solid #1f2937;
+            margin-bottom: 30px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
         }
-
-        .card-icon.blue { background: rgba(96, 165, 250, 0.1); color: #60a5fa; }
-        .card-icon.green { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-        .card-icon.red { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
-
-        .card-title {
-            font-size: 14px;
-            color: #9ca3af;
-            margin-bottom: 8px;
+        .progress-bar-bg {
+            width: 100%;
+            background: #111827;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #374151;
         }
-
-        .card-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 8px;
+        .progress-bar-fill {
+            height: 100%;
+            background: #10b981;
+            width: 0%;
+            transition: width 0.4s ease;
         }
 
         .analytics-section {
@@ -228,11 +245,6 @@
             margin-bottom: 20px;
         }
 
-        .chart-container h3, .recent-transactions h3 {
-            font-size: 16px;
-            color: #f3f4f6;
-        }
-
         .btn-add {
             background: #6366f1;
             color: #fff;
@@ -244,45 +256,7 @@
             font-weight: 600;
             transition: background 0.2s;
         }
-
         .btn-add:hover { background: #4f46e5; }
-
-        .css-chart {
-            display: flex;
-            height: 200px;
-            justify-content: space-around;
-            align-items: flex-end;
-            padding-top: 20px;
-        }
-
-        .bar-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 1;
-            margin: 0 5px;
-            height: 100%;
-            justify-content: flex-end;
-        }
-
-        .bar {
-            width: 100%;
-            background: #374151;
-            border-radius: 6px 6px 0 0;
-            transition: height 0.5s ease;
-            min-height: 4px;
-        }
-
-        .bar-item.active .bar {
-            background: #6366f1;
-            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
-        }
-
-        .bar-item .label {
-            font-size: 12px;
-            color: #9ca3af;
-            margin-top: 10px;
-        }
 
         .transaction-table {
             width: 100%;
@@ -311,7 +285,6 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 11px;
-            transition: background 0.2s;
         }
         .btn-delete:hover { background: rgba(239, 68, 68, 0.3); }
 
@@ -326,7 +299,6 @@
         .tab-pane { display: none; }
         .tab-pane.active-pane { display: block; }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -342,6 +314,7 @@
             border-radius: 12px;
             border: 1px solid #1f2937;
             width: 350px;
+            max-width: 90%;
             display: flex;
             flex-direction: column;
             gap: 15px;
@@ -354,6 +327,7 @@
             border-radius: 6px;
             color: #fff;
             font-size: 14px;
+            width: 100%;
         }
         .modal-actions {
             display: flex;
@@ -374,386 +348,307 @@
         }
         @media (max-width: 768px) {
             .sidebar { display: none; }
-            .main-content { padding: 0 20px 20px 20px; }
+            .main-content { padding: 0 15px 30px 15px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Tela de Login Inicial -->
+    <!-- TELA DE LOGIN -->
     <div id="login-screen">
         <div class="login-card">
-            <h2>Bem-vindo(a) 👋</h2>
-            <p>Digite seu nome para acessar o painel financeiro:</p>
-            <input type="text" id="usernameInput" placeholder="Ex: Duda Freitas">
-            <button onclick="realizarLogin()">Entrar no Sistema</button>
+            <h2>Financial</h2>
+            <p>Entre com sua conta para acessar o painel</p>
+            <form id="login-form" onsubmit="fazerLogin(event)" style="display: flex; flex-direction: column; gap: 15px;">
+                <div class="input-group">
+                    <label>Seu Nome ou E-mail</label>
+                    <input type="text" id="login-email" placeholder="ex: seuemail@dominio.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Senha</label>
+                    <input type="password" id="login-senha" placeholder="••••••••" required>
+                </div>
+                <button type="submit">Acessar Painel</button>
+            </form>
         </div>
     </div>
 
-    <div class="dashboard-container">
-        <!-- Sidebar -->
+    <!-- PAINEL PRINCIPAL -->
+    <div id="app-container" class="dashboard-container" style="display: none;">
+        
         <aside class="sidebar">
-            <div class="brand">Financi<span>al</span></div>
+            <div class="brand">Finan<span>cial</span></div>
             <nav class="sidebar-nav">
-                <a onclick="switchTab('dashboard', this)" class="active" id="nav-dashboard">🏠 Dashboard</a>
-                <a onclick="switchTab('receitas', this)" id="nav-receitas">💰 Receitas</a>
-                <a onclick="switchTab('despesas', this)" id="nav-despesas">🧾 Despesas</a>
-                <a onclick="switchTab('relatorios', this)" id="nav-relatorios">📊 Relatórios</a>
-                <a onclick="switchTab('configuracoes', this)" id="nav-configuracoes">⚙️ Configurações</a>
+                <a onclick="mudarAba('dashboard')" id="nav-dashboard" class="active">📊 Dashboard</a>
+                <a onclick="mudarAba('receitas')" id="nav-receitas">💰 Receitas</a>
+                <a onclick="mudarAba('despesas')" id="nav-despesas">💸 Despesas</a>
+                <a onclick="mudarAba('config')" id="nav-config">⚙️ Configurações</a>
             </nav>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content">
             <header class="top-bar">
-                <h2 id="greeting-text">Olá 👋</h2>
+                <h2 id="saudacao-texto">Bem-vindo(a)</h2>
                 <div class="user-profile">
-                    <div class="avatar" id="user-avatar">DF</div>
+                    <div class="avatar" id="user-initial">U</div>
+                    <button class="btn-logout" onclick="sairDaConta()">Sair</button>
                 </div>
             </header>
 
-            <!-- ABA 1: DASHBOARD -->
-            <div id="pane-dashboard" class="tab-pane active-pane">
-                <section class="kpi-cards">
+            <div id="tab-dashboard" class="tab-pane active-pane">
+                
+                <!-- CARDS DE RESUMO -->
+                <div class="kpi-cards">
                     <div class="card">
-                        <div class="card-icon blue">💰</div>
-                        <p class="card-title">Saldo Atual</p>
-                        <p class="card-value" id="card-saldo">R$ 0,00</p>
+                        <div class="card-title">Saldo Atual</div>
+                        <div class="card-value" id="saldo-total">R$ 0,00</div>
                     </div>
                     <div class="card">
-                        <div class="card-icon green">📥</div>
-                        <p class="card-title">Receitas Totais</p>
-                        <p class="card-value" id="card-receita">R$ 0,00</p>
+                        <div class="card-title">Receitas Totais</div>
+                        <div class="card-value" id="receitas-total" style="color: #10b981;">R$ 0,00</div>
                     </div>
                     <div class="card">
-                        <div class="card-icon red">📤</div>
-                        <p class="card-title">Despesas Totais</p>
-                        <p class="card-value" id="card-despesa">R$ 0,00</p>
+                        <div class="card-title">Despesas Totais</div>
+                        <div class="card-value" id="despesas-total" style="color: #ef4444;">R$ 0,00</div>
                     </div>
-                </section>
+                </div>
 
-                <section class="analytics-section">
+                <!-- META DE ECONOMIA (BARRINHA) -->
+                <div class="goal-card">
+                    <div class="goal-header">
+                        <span style="font-weight: 600; font-size: 14px;">🎯 Meta de Economia Mensal</span>
+                        <div>
+                            <span id="meta-status" style="font-size: 13px; color: #9ca3af; margin-right: 15px;">R$ 0,00 / R$ 1.000,00</span>
+                            <button onclick="definirMeta()" class="btn-add" style="padding: 4px 8px; font-size: 11px;">Alterar Meta</button>
+                        </div>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="meta-progress"></div>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO DE TRANSAÇÕES -->
+                <div class="analytics-section">
                     <div class="chart-container">
-                        <h3>Fluxo de Caixa Geral</h3>
-                        <div class="css-chart" id="dynamic-chart"></div>
+                        <h3>Ações Rápidas</h3>
+                        <p style="color: #9ca3af; font-size: 13px; margin-top: 10px;">Adicione transações e gere relatórios do seu fluxo de caixa atual.</p>
+                        <button onclick="abrirModal()" class="btn-add" style="margin-top: 20px; width: 100%;">+ Nova Transação</button>
+                        <button onclick="exportarDados()" class="btn-cancel" style="border: 1px solid #374151; width: 100%; margin-top: 10px; border-radius: 6px;">📄 Exportar Relatório</button>
                     </div>
 
                     <div class="recent-transactions">
                         <div class="section-header">
                             <h3>Transações Recentes</h3>
-                            <button class="btn-add" id="openModalBtn">+ Nova Transação</button>
                         </div>
-                        <table class="transaction-table">
-                            <thead>
-                                <tr>
-                                    <th>Descrição</th>
-                                    <th>Categoria</th>
-                                    <th>Valor</th>
-                                    <th>Ação</th>
-                                </tr>
-                            </thead>
-                            <tbody id="table-body"></tbody>
-                        </table>
-                    </div>
-                </section>
-            </div>
-
-            <!-- ABA 2: RECEITAS -->
-            <div id="pane-receitas" class="tab-pane">
-                <div class="recent-transactions">
-                    <div class="section-header">
-                        <h3>Todas as Receitas</h3>
-                        <button class="btn-add" onclick="openModalWithDefault('positive')">+ Nova Receita</button>
-                    </div>
-                    <table class="transaction-table">
-                        <thead>
-                            <tr>
-                                <th>Descrição</th>
-                                <th>Categoria</th>
-                                <th>Valor</th>
-                                <th>Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-receitas-body"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- ABA 3: DESPESAS -->
-            <div id="pane-despesas" class="tab-pane">
-                <div class="recent-transactions">
-                    <div class="section-header">
-                        <h3>Todas as Despesas</h3>
-                        <button class="btn-add" onclick="openModalWithDefault('negative')">+ Nova Despesa</button>
-                    </div>
-                    <table class="transaction-table">
-                        <thead>
-                            <tr>
-                                <th>Descrição</th>
-                                <th>Categoria</th>
-                                <th>Valor</th>
-                                <th>Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-despesas-body"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- ABA 4: RELATÓRIOS -->
-            <div id="pane-relatorios" class="tab-pane">
-                <div class="recent-transactions">
-                    <div class="section-header">
-                        <h3>Relatório Financeiro Completo</h3>
-                        <button class="btn-add" onclick="exportReport()">📥 Baixar Relatório (TXT)</button>
-                    </div>
-                    <div style="padding: 20px 0; display: flex; flex-direction: column; gap: 15px; color: #9ca3af;">
-                        <p>🔹 <strong>Balanço Geral:</strong> <span id="relatorio-balanco" style="color: #fff; font-weight: 600;">R$ 0,00</span></p>
-                        <p>🔹 <strong>Total de Transações:</strong> <span id="relatorio-qtd" style="color: #fff;">0</span></p>
-                        <p>🔹 <strong>Status da Conta:</strong> <span id="relatorio-status" style="color: #34d399;">Saudável</span></p>
+                        <div style="overflow-x: auto;">
+                            <table class="transaction-table">
+                                <thead>
+                                    <tr>
+                                        <th>Descrição</th>
+                                        <th>Categoria</th>
+                                        <th>Valor</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabela-transacoes">
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; color: #9ca3af;">Nenhuma transação cadastrada.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ABA 5: CONFIGURAÇÕES -->
-            <div id="pane-configuracoes" class="tab-pane">
-                <div class="recent-transactions">
-                    <div class="section-header">
-                        <h3>Configurações</h3>
-                    </div>
-                    <div style="padding: 20px 0; display: flex; flex-direction: column; gap: 20px;">
-                        <p style="color: #9ca3af; font-size: 14px;">Gerencie os dados salvos localmente.</p>
-                        <button class="btn-add" style="background: #ef4444; width: 220px;" onclick="clearAllData()">🗑️ Limpar Todos os Dados</button>
-                    </div>
+            <div id="tab-receitas" class="tab-pane">
+                <h3 style="margin-bottom: 20px;">Gerenciar Receitas</h3>
+                <p style="color: #9ca3af;">Visualização detalhada das entradas.</p>
+            </div>
+
+            <div id="tab-despesas" class="tab-pane">
+                <h3 style="margin-bottom: 20px;">Gerenciar Despesas</h3>
+                <p style="color: #9ca3af;">Visualização detalhada das saídas.</p>
+            </div>
+
+            <div id="tab-config" class="tab-pane">
+                <h3 style="margin-bottom: 20px;">Configurações da Conta</h3>
+                <div class="card" style="max-width: 400px; display: flex; flex-direction: column; gap: 15px;">
+                    <p style="color: #9ca3af; font-size: 14px;">Apagar todos os dados salvos no navegador e redefinir o sistema.</p>
+                    <button onclick="limparDados()" class="btn-delete" style="padding: 10px; font-size: 13px;">Limpar Todos os Dados</button>
                 </div>
             </div>
 
         </main>
     </div>
 
-    <!-- Modal de Cadastro -->
-    <div class="modal" id="transactionModal">
+    <!-- MODAL -->
+    <div id="modal-transacao" class="modal">
         <div class="modal-content">
-            <h3 id="modal-title">Nova Transação</h3>
-            <input type="text" id="descInput" placeholder="Ex: Salário ou Aluguel">
-            <input type="number" id="valueInput" placeholder="Valor (Ex: 1500)">
-            <select id="categoryInput">
-                <option value="Trabalho/Salário">Trabalho/Salário</option>
-                <option value="Alimentação">Alimentação</option>
-                <option value="Moradia">Moradia</option>
-                <option value="Lazer">Lazer</option>
-                <option value="Transporte">Transporte</option>
-                <option value="Outros">Outros</option>
-            </select>
-            <select id="typeInput">
-                <option value="positive">Receita (+)</option>
-                <option value="negative">Despesa (-)</option>
-            </select>
+            <h3>Nova Transação</h3>
+            <div class="input-group">
+                <label>Descrição</label>
+                <input type="text" id="desc-transacao" placeholder="Ex: Salário, Aluguel...">
+            </div>
+            <div class="input-group">
+                <label>Valor (R$)</label>
+                <input type="number" id="valor-transacao" placeholder="0.00" step="0.01">
+            </div>
+            <div class="input-group">
+                <label>Tipo</label>
+                <select id="tipo-transacao">
+                    <option value="receita">Receita (Entrada)</option>
+                    <option value="despesa">Despesa (Saída)</option>
+                </select>
+            </div>
             <div class="modal-actions">
-                <button class="btn-cancel" id="closeModalBtn">Cancelar</button>
-                <button class="btn-add" id="saveTransactionBtn">Adicionar</button>
+                <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+                <button class="btn-add" onclick="salvarTransacao()">Adicionar</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Sistema de Login e Identificação
-        let userName = localStorage.getItem('fin_username');
-        const loginScreen = document.getElementById('login-screen');
+        let transacoes = JSON.parse(localStorage.getItem('transacoes')) || [];
+        let metaMensal = parseFloat(localStorage.getItem('metaMensal')) || 1000.00;
+        let usuarioLogado = localStorage.getItem('usuarioLogado');
 
-        if (userName) {
-            loginScreen.style.display = 'none';
-            inicializarPainel(userName);
+        window.onload = function() {
+            if (usuarioLogado) {
+                entrarNoSistema(usuarioLogado);
+            }
+        };
+
+        function fazerLogin(event) {
+            event.preventDefault();
+            const emailInput = document.getElementById('login-email').value;
+            localStorage.setItem('usuarioLogado', emailInput);
+            entrarNoSistema(emailInput);
         }
 
-        function realizarLogin() {
-            const inputVal = document.getElementById('usernameInput').value.trim();
-            if (!inputVal) {
-                alert('Por favor, digite seu nome.');
+        function entrarNoSistema(usuario) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-container').style.display = 'flex';
+            
+            let nomeExibicao = usuario.split('@')[0];
+            nomeExibicao = nomeExibicao.charAt(0).toUpperCase() + nomeExibicao.slice(1);
+            
+            document.getElementById('user-initial').innerText = nomeExibicao.charAt(0).toUpperCase();
+
+            const hora = new Date().getHours();
+            let saudacao = "Bom dia";
+            if (hora >= 12 && hora < 18) saudacao = "Boa tarde";
+            if (hora >= 18) saudacao = "Boa noite";
+
+            document.getElementById('saudacao-texto').innerText = `${saudacao}, ${nomeExibicao} ✨`;
+            atualizarDashboard();
+        }
+
+        function sairDaConta() {
+            localStorage.removeItem('usuarioLogado');
+            location.reload();
+        }
+
+        function mudarAba(abaId) {
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active-pane'));
+            document.querySelectorAll('.sidebar-nav a').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('tab-' + abaId).classList.add('active-pane');
+            document.getElementById('nav-' + abaId).classList.add('active');
+        }
+
+        function abrirModal() { document.getElementById('modal-transacao').style.display = 'flex'; }
+        function fecharModal() { document.getElementById('modal-transacao').style.display = 'none'; }
+
+        function salvarTransacao() {
+            const desc = document.getElementById('desc-transacao').value;
+            const valor = parseFloat(document.getElementById('valor-transacao').value);
+            const tipo = document.getElementById('tipo-transacao').value;
+
+            if (!desc || isNaN(valor) || valor <= 0) {
+                alert('Preencha todos os campos corretamente!');
                 return;
             }
-            localStorage.setItem('fin_username', inputVal);
-            loginScreen.style.display = 'none';
-            inicializarPainel(inputVal);
+
+            transacoes.push({ id: Date.now(), desc, valor, tipo });
+            localStorage.setItem('transacoes', JSON.stringify(transacoes));
+
+            fecharModal();
+            document.getElementById('desc-transacao').value = '';
+            document.getElementById('valor-transacao').value = '';
+            atualizarDashboard();
         }
 
-        function inicializarPainel(nome) {
-            // Saudação dinâmica em tempo real por horário
-            const hour = new Date().getHours();
-            const greetingText = document.getElementById('greeting-text');
-            
-            if (hour >= 6 && hour < 12) {
-                greetingText.innerText = `Bom dia, ${nome} ☀️`;
-            } else if (hour >= 12 && hour < 18) {
-                greetingText.innerText = `Boa tarde, ${nome} 🌤️`;
+        function deletarTransacao(id) {
+            transacoes = transacoes.filter(t => t.id !== id);
+            localStorage.setItem('transacoes', JSON.stringify(transacoes));
+            atualizarDashboard();
+        }
+
+        function atualizarDashboard() {
+            let receitas = 0;
+            let despesas = 0;
+            let tbody = document.getElementById('tabela-transacoes');
+            tbody.innerHTML = '';
+
+            if (transacoes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #9ca3af;">Nenhuma transação cadastrada.</td></tr>`;
             } else {
-                greetingText.innerText = `Boa noite, ${nome} 🌙`;
+                transacoes.slice().reverse().forEach(t => {
+                    if (t.tipo === 'receita') receitas += t.valor;
+                    else despesas += t.valor;
+
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${t.desc}</td>
+                        <td><span class="badge-cat">${t.tipo === 'receita' ? 'Receita' : 'Despesa'}</span></td>
+                        <td style="color: ${t.tipo === 'receita' ? '#10b981' : '#ef4444'}; font-weight: 600;">
+                            ${t.tipo === 'receita' ? '+' : '-'} R$ ${t.valor.toFixed(2)}
+                        </td>
+                        <td><button class="btn-delete" onclick="deletarTransacao(${t.id})">Excluir</button></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
             }
 
-            // Cria as iniciais do avatar automaticamente
-            const iniciais = nome.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-            document.getElementById('user-avatar').innerText = iniciais;
+            let saldo = receitas - despesas;
+            document.getElementById('saldo-total').innerText = `R$ ${saldo.toFixed(2)}`;
+            document.getElementById('receitas-total').innerText = `R$ ${receitas.toFixed(2)}`;
+            document.getElementById('despesas-total').innerText = `R$ ${despesas.toFixed(2)}`;
+
+            let progressoPercent = (metaMensal > 0 ? (saldo / metaMensal) * 100 : 0);
+            if (progressoPercent > 100) progressoPercent = 100;
+            if (progressoPercent < 0) progressoPercent = 0;
+
+            document.getElementById('meta-progress').style.width = `${progressoPercent}%`;
+            document.getElementById('meta-status').innerText = `R$ ${saldo.toFixed(2)} / R$ ${metaMensal.toFixed(2)}`;
         }
 
-        let transactions = JSON.parse(localStorage.getItem('fin_transactions')) || [];
-
-        const modal = document.getElementById('transactionModal');
-        const openBtn = document.getElementById('openModalBtn');
-        const closeBtn = document.getElementById('closeModalBtn');
-        const saveBtn = document.getElementById('saveTransactionBtn');
-        const descInput = document.getElementById('descInput');
-        const valueInput = document.getElementById('valueInput');
-        const categoryInput = document.getElementById('categoryInput');
-        const typeInput = document.getElementById('typeInput');
-        
-        const tableBody = document.getElementById('table-body');
-        const tableReceitasBody = document.getElementById('table-receitas-body');
-        const tableDespesasBody = document.getElementById('table-despesas-body');
-        
-        const cardSaldo = document.getElementById('card-saldo');
-        const cardReceita = document.getElementById('card-receita');
-        const cardDespesa = document.getElementById('card-despesa');
-
-        function switchTab(tabName, element) {
-            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active-pane'));
-            document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
-
-            document.getElementById('pane-' + tabName).classList.add('active-pane');
-            if(element) element.classList.add('active');
-        }
-
-        function formatMoney(val) {
-            return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        }
-
-        function updateDashboard() {
-            tableBody.innerHTML = '';
-            tableReceitasBody.innerHTML = '';
-            tableDespesasBody.innerHTML = '';
-
-            let totalReceitas = 0;
-            let totalDespesas = 0;
-
-            if (transactions.length === 0) {
-                const emptyHTML = `<tr><td colspan="4" style="text-align: center; color: #6b7280; padding: 20px;">Nenhuma transação cadastrada.</td></tr>`;
-                tableBody.innerHTML = emptyHTML;
-                tableReceitasBody.innerHTML = emptyHTML;
-                tableDespesasBody.innerHTML = emptyHTML;
-            }
-
-            let receitasList = [];
-            let despesasList = [];
-
-            transactions.forEach((t) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${t.desc}</td>
-                    <td><span class="badge-cat">${t.category}</span></td>
-                    <td class="${t.type}" style="color: ${t.type === 'positive' ? '#34d399' : '#f87171'}; font-weight: 500;">
-                        ${t.type === 'positive' ? '+ ' : '- '}${formatMoney(t.amount)}
-                    </td>
-                    <td><button class="btn-delete" onclick="removeTransaction(${t.id})">Excluir</button></td>
-                `;
-
-                if (t.type === 'positive') {
-                    totalReceitas += t.amount;
-                    receitasList.push(tr.cloneNode(true));
-                } else {
-                    totalDespesas += t.amount;
-                    despesasList.push(tr.cloneNode(true));
-                }
-
-                tableBody.appendChild(tr.cloneNode(true));
-            });
-
-            receitasList.forEach(el => tableReceitasBody.appendChild(el));
-            despesasList.forEach(el => tableDespesasBody.appendChild(el));
-
-            if(receitasList.length === 0) tableReceitasBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #6b7280; padding: 20px;">Nenhuma receita registrada.</td></tr>`;
-            if(despesasList.length === 0) tableDespesasBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #6b7280; padding: 20px;">Nenhuma despesa registrada.</td></tr>`;
-
-            const saldoTotal = totalReceitas - totalDespesas;
-            cardSaldo.innerText = formatMoney(saldoTotal);
-            cardReceita.innerText = formatMoney(totalReceitas);
-            cardDespesa.innerText = formatMoney(totalDespesas);
-
-            document.getElementById('relatorio-balanco').innerText = formatMoney(saldoTotal);
-            document.getElementById('relatorio-qtd').innerText = transactions.length;
-
-            updateChart(totalReceitas, totalDespesas);
-            localStorage.setItem('fin_transactions', JSON.stringify(transactions));
-        }
-
-        function updateChart(rec, des) {
-            const chart = document.getElementById('dynamic-chart');
-            chart.innerHTML = '';
-            const maxVal = Math.max(rec, des, 100);
-            const recHeight = Math.min(Math.round((rec / maxVal) * 160), 160);
-            const desHeight = Math.min(Math.round((des / maxVal) * 160), 160);
-
-            chart.innerHTML = `
-                <div class="bar-item"><span class="bar" style="height: ${Math.max(recHeight, 15)}px; background: #10b981;"></span><span class="label">Receitas</span></div>
-                <div class="bar-item active"><span class="bar" style="height: ${Math.max(desHeight, 15)}px; background: #ef4444;"></span><span class="label">Despesas</span></div>
-            `;
-        }
-
-        window.removeTransaction = function(id) {
-            transactions = transactions.filter(t => t.id !== id);
-            updateDashboard();
-        }
-
-        function openModalWithDefault(type) {
-            typeInput.value = type;
-            modal.style.display = 'flex';
-        }
-
-        function clearAllData() {
-            if(confirm('Deseja limpar todos os dados?')) {
-                transactions = [];
-                localStorage.removeItem('fin_username');
-                location.reload();
+        function definirMeta() {
+            let novaMeta = prompt("Digite o valor da sua meta de economia mensal (R$):", metaMensal);
+            if (novaMeta && !isNaN(novaMeta)) {
+                metaMensal = parseFloat(novaMeta);
+                localStorage.setItem('metaMensal', metaMensal);
+                atualizarDashboard();
             }
         }
 
-        function exportReport() {
-            let content = "--- RELATÓRIO FINANCEIRO ---\n\n";
-            transactions.forEach(t => {
-                content += `${t.date} | ${t.desc} | ${t.category} | ${t.type === 'positive' ? '+' : '-'}${t.amount}\n`;
-            });
-            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
+        function exportarDados() {
+            let conteudo = "Descricao,Tipo,Valor\n" + transacoes.map(t => `${t.desc},${t.tipo},${t.valor}`).join("\n");
+            let blob = new Blob([conteudo], { type: 'text/csv;charset=utf-8;' });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
             a.href = url;
-            a.download = 'relatorio-financeiro.txt';
+            a.download = 'relatorio_financeiro.csv';
             a.click();
         }
 
-        openBtn.addEventListener('click', () => { typeInput.value = 'positive'; modal.style.display = 'flex'; });
-        closeBtn.addEventListener('click', () => modal.style.display = 'none');
-        window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
-
-        saveBtn.addEventListener('click', () => {
-            const desc = descInput.value.trim();
-            const val = parseFloat(valueInput.value);
-            const category = categoryInput.value;
-            const type = typeInput.value;
-
-            if (!desc || isNaN(val) || val <= 0) {
-                alert('Preencha os campos corretamente.');
-                return;
+        function limparDados() {
+            if (confirm("Tem certeza que deseja apagar todos os dados?")) {
+                localStorage.clear();
+                location.reload();
             }
-
-            const dataHoje = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-
-            transactions.unshift({ id: Date.now(), desc, date: dataHoje, category, amount: val, type });
-            updateDashboard();
-
-            descInput.value = '';
-            valueInput.value = '';
-            modal.style.display = 'none';
-        });
-
-        updateDashboard();
+        }
     </script>
 </body>
 </html>
