@@ -150,12 +150,6 @@
             margin-bottom: 8px;
         }
 
-        .card-trend {
-            font-size: 13px;
-        }
-        .card-trend.up { color: #34d399; }
-        .card-trend.down { color: #f87171; }
-
         .analytics-section {
             display: grid;
             grid-template-columns: 2fr 3fr;
@@ -250,8 +244,6 @@
             color: #f3f4f6;
             border-bottom: 1px solid #1f2937;
         }
-
-        .transaction-table tr:last-child td { border-bottom: none; }
 
         .btn-delete {
             background: rgba(239, 68, 68, 0.1);
@@ -359,19 +351,16 @@
                         <div class="card-icon blue">💰</div>
                         <p class="card-title">Saldo Atual</p>
                         <p class="card-value" id="card-saldo">R$ 0,00</p>
-                        <p class="card-trend up">↑ Dinheiro em conta</p>
                     </div>
                     <div class="card">
                         <div class="card-icon green">📥</div>
                         <p class="card-title">Receitas Totais</p>
                         <p class="card-value" id="card-receita">R$ 0,00</p>
-                        <p class="card-trend up">↑ Entradas</p>
                     </div>
                     <div class="card">
                         <div class="card-icon red">📤</div>
                         <p class="card-title">Despesas Totais</p>
                         <p class="card-value" id="card-despesa">R$ 0,00</p>
-                        <p class="card-trend down">↓ Saídas</p>
                     </div>
                 </section>
 
@@ -451,9 +440,9 @@
                         <button class="btn-add" onclick="exportReport()">📥 Baixar Relatório (TXT)</button>
                     </div>
                     <div style="padding: 20px 0; display: flex; flex-direction: column; gap: 15px; color: #9ca3af;">
-                        <p>🔹 **Balanço Geral:** <span id="relatorio-balanco" style="color: #fff; font-weight: 600;">R$ 0,00</span></p>
-                        <p>🔹 **Total de Transações:** <span id="relatorio-qtd" style="color: #fff;">0</span></p>
-                        <p>🔹 **Status da Conta:** <span id="relatorio-status" style="color: #34d399;">Saudável</span></p>
+                        <p>🔹 <strong>Balanço Geral:</strong> <span id="relatorio-balanco" style="color: #fff; font-weight: 600;">R$ 0,00</span></p>
+                        <p>🔹 <strong>Total de Transações:</strong> <span id="relatorio-qtd" style="color: #fff;">0</span></p>
+                        <p>🔹 <strong>Status da Conta:</strong> <span id="relatorio-status" style="color: #34d399;">Saudável</span></p>
                     </div>
                 </div>
             </div>
@@ -500,7 +489,6 @@
     </div>
 
     <script>
-        // Saudação por horário dinâmica
         const hour = new Date().getHours();
         const greetingText = document.getElementById('greeting-text');
         if (hour >= 6 && hour < 12) {
