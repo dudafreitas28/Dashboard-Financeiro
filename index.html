@@ -21,6 +21,64 @@
             overflow: hidden;
         }
 
+        /* Tela de Login / Identificação */
+        #login-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #05070a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-card {
+            background: #0b0f19;
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid #1f2937;
+            width: 380px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .login-card h2 {
+            color: #fff;
+            font-size: 22px;
+        }
+
+        .login-card p {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .login-card input {
+            background: #111827;
+            border: 1px solid #374151;
+            padding: 12px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 15px;
+            text-align: center;
+        }
+
+        .login-card button {
+            background: #6366f1;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .login-card button:hover {
+            background: #4f46e5;
+        }
+
         .dashboard-container {
             display: flex;
             width: 100%;
@@ -322,6 +380,16 @@
 </head>
 <body>
 
+    <!-- Tela de Login Inicial -->
+    <div id="login-screen">
+        <div class="login-card">
+            <h2>Bem-vindo(a) 👋</h2>
+            <p>Digite seu nome para acessar o painel financeiro:</p>
+            <input type="text" id="usernameInput" placeholder="Ex: Duda Freitas">
+            <button onclick="realizarLogin()">Entrar no Sistema</button>
+        </div>
+    </div>
+
     <div class="dashboard-container">
         <!-- Sidebar -->
         <aside class="sidebar">
@@ -338,9 +406,9 @@
         <!-- Main Content -->
         <main class="main-content">
             <header class="top-bar">
-                <h2 id="greeting-text">Olá, Duda 👋</h2>
+                <h2 id="greeting-text">Olá 👋</h2>
                 <div class="user-profile">
-                    <div class="avatar">DF</div>
+                    <div class="avatar" id="user-avatar">DF</div>
                 </div>
             </header>
 
@@ -489,14 +557,42 @@
     </div>
 
     <script>
-        const hour = new Date().getHours();
-        const greetingText = document.getElementById('greeting-text');
-        if (hour >= 6 && hour < 12) {
-            greetingText.innerText = "Bom dia, Duda ☀️";
-        } else if (hour >= 12 && hour < 18) {
-            greetingText.innerText = "Boa tarde, Duda 🌤️";
-        } else {
-            greetingText.innerText = "Boa noite, Duda 🌙";
+        // Sistema de Login e Identificação
+        let userName = localStorage.getItem('fin_username');
+        const loginScreen = document.getElementById('login-screen');
+
+        if (userName) {
+            loginScreen.style.display = 'none';
+            inicializarPainel(userName);
+        }
+
+        function realizarLogin() {
+            const inputVal = document.getElementById('usernameInput').value.trim();
+            if (!inputVal) {
+                alert('Por favor, digite seu nome.');
+                return;
+            }
+            localStorage.setItem('fin_username', inputVal);
+            loginScreen.style.display = 'none';
+            inicializarPainel(inputVal);
+        }
+
+        function inicializarPainel(nome) {
+            // Saudação dinâmica em tempo real por horário
+            const hour = new Date().getHours();
+            const greetingText = document.getElementById('greeting-text');
+            
+            if (hour >= 6 && hour < 12) {
+                greetingText.innerText = `Bom dia, ${nome} ☀️`;
+            } else if (hour >= 12 && hour < 18) {
+                greetingText.innerText = `Boa tarde, ${nome} 🌤️`;
+            } else {
+                greetingText.innerText = `Boa noite, ${nome} 🌙`;
+            }
+
+            // Cria as iniciais do avatar automaticamente
+            const iniciais = nome.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+            document.getElementById('user-avatar').innerText = iniciais;
         }
 
         let transactions = JSON.parse(localStorage.getItem('fin_transactions')) || [];
@@ -614,7 +710,8 @@
         function clearAllData() {
             if(confirm('Deseja limpar todos os dados?')) {
                 transactions = [];
-                updateDashboard();
+                localStorage.removeItem('fin_username');
+                location.reload();
             }
         }
 
