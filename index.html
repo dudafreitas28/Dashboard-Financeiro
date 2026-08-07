@@ -194,7 +194,6 @@
         .card-title { font-size: 14px; color: #9ca3af; margin-bottom: 8px; }
         .card-value { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 8px; }
 
-        /* Meta de Economia Refinada */
         .goal-card {
             background: #0b0f19;
             padding: 20px 25px;
@@ -231,7 +230,7 @@
             gap: 30px;
         }
 
-        .chart-container, .recent-transactions {
+        .chart-container, .recent-transactions, .tab-content-box {
             background: #0b0f19;
             padding: 25px;
             border-radius: 12px;
@@ -395,9 +394,8 @@
                 </div>
             </header>
 
+            <!-- ABA DASHBOARD -->
             <div id="tab-dashboard" class="tab-pane active-pane">
-                
-                <!-- CARDS DE RESUMO -->
                 <div class="kpi-cards">
                     <div class="card">
                         <div class="card-title">Saldo Atual</div>
@@ -413,7 +411,6 @@
                     </div>
                 </div>
 
-                <!-- META DE ECONOMIA (BARRINHA) -->
                 <div class="goal-card">
                     <div class="goal-header">
                         <span style="font-weight: 600; font-size: 14px;">🎯 Meta de Economia Mensal</span>
@@ -427,7 +424,6 @@
                     </div>
                 </div>
 
-                <!-- SEÇÃO DE TRANSAÇÕES -->
                 <div class="analytics-section">
                     <div class="chart-container">
                         <h3>Ações Rápidas</h3>
@@ -461,16 +457,53 @@
                 </div>
             </div>
 
+            <!-- ABA RECEITAS -->
             <div id="tab-receitas" class="tab-pane">
-                <h3 style="margin-bottom: 20px;">Gerenciar Receitas</h3>
-                <p style="color: #9ca3af;">Visualização detalhada das entradas.</p>
+                <div class="tab-content-box">
+                    <h3 style="margin-bottom: 20px;">Gerenciar Receitas</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="transaction-table">
+                            <thead>
+                                <tr>
+                                    <th>Descrição</th>
+                                    <th>Valor</th>
+                                    <th>Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-receitas">
+                                <tr>
+                                    <td colspan="3" style="text-align: center; color: #9ca3af;">Nenhuma receita cadastrada.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
+            <!-- ABA DESPESAS -->
             <div id="tab-despesas" class="tab-pane">
-                <h3 style="margin-bottom: 20px;">Gerenciar Despesas</h3>
-                <p style="color: #9ca3af;">Visualização detalhada das saídas.</p>
+                <div class="tab-content-box">
+                    <h3 style="margin-bottom: 20px;">Gerenciar Despesas</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="transaction-table">
+                            <thead>
+                                <tr>
+                                    <th>Descrição</th>
+                                    <th>Valor</th>
+                                    <th>Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-despesas">
+                                <tr>
+                                    <td colspan="3" style="text-align: center; color: #9ca3af;">Nenhuma despesa cadastrada.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
+            <!-- ABA CONFIGURAÇÕES -->
             <div id="tab-config" class="tab-pane">
                 <h3 style="margin-bottom: 20px;">Configurações da Conta</h3>
                 <div class="card" style="max-width: 400px; display: flex; flex-direction: column; gap: 15px;">
@@ -588,11 +621,21 @@
         function atualizarDashboard() {
             let receitas = 0;
             let despesas = 0;
-            let tbody = document.getElementById('tabela-transacoes');
-            tbody.innerHTML = '';
+            
+            let tbodyDashboard = document.getElementById('tabela-transacoes');
+            let tbodyReceitas = document.getElementById('tabela-receitas');
+            let tbodyDespesas = document.getElementById('tabela-despesas');
 
+            tbodyDashboard.innerHTML = '';
+            tbodyReceitas.innerHTML = '';
+            tbodyDespesas.innerHTML = '';
+
+            let listaReceitas = transacoes.filter(t => t.tipo === 'receita');
+            let listaDespesas = transacoes.filter(t => t.tipo === 'despesa');
+
+            // Preenche Dashboard
             if (transacoes.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #9ca3af;">Nenhuma transação cadastrada.</td></tr>`;
+                tbodyDashboard.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #9ca3af;">Nenhuma transação cadastrada.</td></tr>`;
             } else {
                 transacoes.slice().reverse().forEach(t => {
                     if (t.tipo === 'receita') receitas += t.valor;
@@ -607,7 +650,37 @@
                         </td>
                         <td><button class="btn-delete" onclick="deletarTransacao(${t.id})">Excluir</button></td>
                     `;
-                    tbody.appendChild(tr);
+                    tbodyDashboard.appendChild(tr);
+                });
+            }
+
+            // Preenche Aba Receitas
+            if (listaReceitas.length === 0) {
+                tbodyReceitas.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #9ca3af;">Nenhuma receita cadastrada.</td></tr>`;
+            } else {
+                listaReceitas.slice().reverse().forEach(t => {
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${t.desc}</td>
+                        <td style="color: #10b981; font-weight: 600;">+ R$ ${t.valor.toFixed(2)}</td>
+                        <td><button class="btn-delete" onclick="deletarTransacao(${t.id})">Excluir</button></td>
+                    `;
+                    tbodyReceitas.appendChild(tr);
+                });
+            }
+
+            // Preenche Aba Despesas
+            if (listaDespesas.length === 0) {
+                tbodyDespesas.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #9ca3af;">Nenhuma despesa cadastrada.</td></tr>`;
+            } else {
+                listaDespesas.slice().reverse().forEach(t => {
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${t.desc}</td>
+                        <td style="color: #ef4444; font-weight: 600;">- R$ ${t.valor.toFixed(2)}</td>
+                        <td><button class="btn-delete" onclick="deletarTransacao(${t.id})">Excluir</button></td>
+                    `;
+                    tbodyDespesas.appendChild(tr);
                 });
             }
 
