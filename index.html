@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Financial | Controle Financeiro Profissional</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Importando o Chart.js para gráficos profissionais -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
             margin: 0;
@@ -226,8 +228,9 @@
 
         .analytics-section {
             display: grid;
-            grid-template-columns: 2fr 3fr;
+            grid-template-columns: 1fr 1fr;
             gap: 30px;
+            margin-bottom: 30px;
         }
 
         .chart-container, .recent-transactions, .tab-content-box {
@@ -424,35 +427,44 @@
                     </div>
                 </div>
 
+                <!-- GRÁFICO E AÇÕES RÁPIDAS -->
                 <div class="analytics-section">
+                    <div class="chart-container">
+                        <h3 style="margin-bottom: 15px;">Visão Geral</h3>
+                        <div style="position: relative; height: 220px; display: flex; justify-content: center; align-items: center;">
+                            <canvas id="graficoFinanceiro"></canvas>
+                        </div>
+                    </div>
+
                     <div class="chart-container">
                         <h3>Ações Rápidas</h3>
                         <p style="color: #9ca3af; font-size: 13px; margin-top: 10px;">Adicione transações e gere relatórios do seu fluxo de caixa atual.</p>
-                        <button onclick="abrirModal()" class="btn-add" style="margin-top: 20px; width: 100%;">+ Nova Transação</button>
-                        <button onclick="exportarDados()" class="btn-cancel" style="border: 1px solid #374151; width: 100%; margin-top: 10px; border-radius: 6px;">📄 Exportar Relatório</button>
+                        <button onclick="abrirModal()" class="btn-add" style="margin-top: 25px; width: 100%;">+ Nova Transação</button>
+                        <button onclick="exportarDados()" class="btn-cancel" style="border: 1px solid #374151; width: 100%; margin-top: 12px; border-radius: 6px;">📄 Exportar Relatório</button>
                     </div>
+                </div>
 
-                    <div class="recent-transactions">
-                        <div class="section-header">
-                            <h3>Transações Recentes</h3>
-                        </div>
-                        <div style="overflow-x: auto;">
-                            <table class="transaction-table">
-                                <thead>
-                                    <tr>
-                                        <th>Descrição</th>
-                                        <th>Categoria</th>
-                                        <th>Valor</th>
-                                        <th>Ação</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabela-transacoes">
-                                    <tr>
-                                        <td colspan="4" style="text-align: center; color: #9ca3af;">Nenhuma transação cadastrada.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                <!-- TRANSAÇÕES RECENTES -->
+                <div class="recent-transactions">
+                    <div class="section-header">
+                        <h3>Transações Recentes</h3>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="transaction-table">
+                            <thead>
+                                <tr>
+                                    <th>Descrição</th>
+                                    <th>Categoria</th>
+                                    <th>Valor</th>
+                                    <th>Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-transacoes">
+                                <tr>
+                                    <td colspan="4" style="text-align: center; color: #9ca3af;">Nenhuma transação cadastrada.</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -545,6 +557,7 @@
         let transacoes = JSON.parse(localStorage.getItem('transacoes')) || [];
         let metaMensal = parseFloat(localStorage.getItem('metaMensal')) || 1000.00;
         let usuarioLogado = localStorage.getItem('usuarioLogado');
+        let meuGrafico = null;
 
         window.onload = function() {
             if (usuarioLogado) {
@@ -588,6 +601,13 @@
             
             document.getElementById('tab-' + abaId).classList.add('active-pane');
             document.getElementById('nav-' + abaId).classList.add('active');
+
+            if (abaId === 'dashboard') {
+                atualizarGrafico(
+                    transacoes.filter(t => t.tipo === 'receita').reduce((acc, t) => acc + t.valor, 0),
+                    transacoes.filter(t => t.tipo === 'despesa').reduce((acc, t) => acc + t.valor, 0)
+                );
+            }
         }
 
         function abrirModal() { document.getElementById('modal-transacao').style.display = 'flex'; }
@@ -618,6 +638,36 @@
             atualizarDashboard();
         }
 
+        function atualizarGrafico(receitas, despesas) {
+            const ctx = document.getElementById('graficoFinanceiro').getContext('2d');
+            
+            if (meuGrafico) {
+                meuGrafico.destroy();
+            }
+
+            meuGrafico = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Receitas', 'Despesas'],
+                    datasets: [{
+                        data: [receitas, despesas],
+                        backgroundColor: ['#10b981', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#9ca3af', font: { family: 'Inter', size: 12 } }
+                        }
+                    }
+                }
+            });
+        }
+
         function atualizarDashboard() {
             let receitas = 0;
             let despesas = 0;
@@ -633,7 +683,6 @@
             let listaReceitas = transacoes.filter(t => t.tipo === 'receita');
             let listaDespesas = transacoes.filter(t => t.tipo === 'despesa');
 
-            // Preenche Dashboard
             if (transacoes.length === 0) {
                 tbodyDashboard.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #9ca3af;">Nenhuma transação cadastrada.</td></tr>`;
             } else {
@@ -654,7 +703,6 @@
                 });
             }
 
-            // Preenche Aba Receitas
             if (listaReceitas.length === 0) {
                 tbodyReceitas.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #9ca3af;">Nenhuma receita cadastrada.</td></tr>`;
             } else {
@@ -669,7 +717,6 @@
                 });
             }
 
-            // Preenche Aba Despesas
             if (listaDespesas.length === 0) {
                 tbodyDespesas.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #9ca3af;">Nenhuma despesa cadastrada.</td></tr>`;
             } else {
@@ -695,6 +742,8 @@
 
             document.getElementById('meta-progress').style.width = `${progressoPercent}%`;
             document.getElementById('meta-status').innerText = `R$ ${saldo.toFixed(2)} / R$ ${metaMensal.toFixed(2)}`;
+
+            atualizarGrafico(receitas, despesas);
         }
 
         function definirMeta() {
